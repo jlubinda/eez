@@ -6,7 +6,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="eez",
+    name="jsql",
+	install_requires=['asyncpg','asyncio'],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
     version="1",
     author="Joseph S. Lubinda",
     author_email="joseph@obtir.com",

@@ -2,8 +2,9 @@ import psycopg2
 import asyncpg
 import asyncio
 import re
+from pydoc import locate
 
-class JSQL:
+class jsql:
 	def __init__(self):
 		pass
 	
@@ -13,74 +14,114 @@ class JSQL:
 	def getValue(self,mydict,key,alt=False):
 		return mydict.get(key,lambda: alt)()
 	
-	def decodeInsert(self,mydict,key,alt=False):
-		return mydict.get(key,lambda: alt)()
+	def decodeInsert(self,mydict):
+		return "",""
 	
-	def decodeSelect(self,mydict,key,alt=False):
-		return mydict.get(key,lambda: alt)()
+	def decodeSelectAll(self,mydict):
+		return "",""
 	
-	def decodeUpdate(self,mydict,key,alt=False):
-		return mydict.get(key,lambda: alt)()
+	def decodeSelect(self,mydict):
+		return "",""
 	
-	def decodeDelete(self,mydict,key,alt=False):
-		return mydict.get(key,lambda: alt)()
+	def decodeUpdate(self,mydict):
+		return "",""
 	
-	def decodeTruncate(self,mydict,key,alt=False):
-		return mydict.get(key,lambda: alt)()
+	def decodeDelete(self,mydict):
+		return "",""
+	
+	def decodeTruncate(self,mydict):
+		return ""
+	
+	def decodeProcess(self,mydict):
+		return "",""
 		
 	def checkDictWithKey(self,mydict,key):
-		if mydict.get([mydict[key],lambda: None)()== None:
+		if mydict.get(mydict[key],lambda: None)()== None:
 			return None
 		else:
 			return key
 		
 	def getDictWithKey(self,mydict,key):
-		return mydict.get([mydict[key],lambda: None)()
+		return mydict.get(mydict[key],lambda: None)()
 		
+	def runProcess(self,module_submodule_and_class,mymethod,params):
+		my_class = locate(module_submodule_and_class) # eg "module.submodule.class"
+		instance = my_class()
+		return getattr(instance, mymethod)(*params) # my method is the function being called to process the data. params is a list containing the parameters which the method takes in.
 	
-	def decodeJSON(self,mydict):
+	def jsonDecoder(self,mydict):
+		my_key = list(mydict.keys())[0]
+		my_dict = mydict[my_key]
+		
+		if my_key.upper()=="SELECTALL":
+			qry,params = self.decodeSelectAll(my_dict)
+		elif my_key.upper()=="SELECT":
+			qry,params = self.decodeSelect(my_dict)
+		elif my_key.upper()=="INSERT":
+			qry,params = self.decodeInsert(my_dict)
+		elif my_key.upper()=="UPDATE":
+			qry,params = self.decodeUpdate(my_dict)
+		elif my_key.upper()=="DELETE":
+			qry,params = self.decodeDelete(my_dict)
+		elif my_key.upper()=="TRUNCATE":
+			qry = self.decodeTruncate(my_dict)
+			params = None
+		elif my_key.upper()=="PROCESS":
+			module_submodule_and_class = my_dict["FROM"]
+			mymethod = my_dict["USING"]
+			params = my_dict["DATA"]
+			withData = my_dict["WITH"]
+			qry = self.runProcess(module_submodule_and_class,mymethod,params)
+			
+			if withData != None and withData != "":
+			else:
+		
+		return qry,params,my_key
+		
+		
+	async def runQuery(self,con,mydict):
 		qerrors = []
-		qry = ""
 		
-		selectAllQry,myKey = self.checkKey(mydict,"SELECTALL")
-		selectQry = self.checkKey(mydict,"SELECT")
-		insertQry = self.checkKey(mydict,"INSERT")
-		updateQry = self.checkKey(mydict,"UPDATE")
-		deleteQry = self.checkKey(mydict,"DELETE")
-		truncateQry = self.checkKey(mydict,"TRUNCATE")
 		
-		qryList1 = list(set([self.getDictWithKey(mydict,"SELECTALL"),self.getDictWithKey(mydict,"SELECT"),self.getDictWithKey(mydict,"INSERT"),self.getDictWithKey(mydict,"UPDATE"),self.getDictWithKey(mydict,"DELETE"),self.getDictWithKey(mydict,"TRUNCATE")]))
+		num_queries = len(mydict)
 		
-		qryList = [i for i in qryList1 if i]
-		
-		try:
-			selectall_dict = 
-			
-			
-		except:
-			try:
-				selecta_dict = 
+		if num_queries>1:
+			qry = ""
+			c = 0
+			qry_list = []
+			keys_list = []
+			params_list = []
+			output = []
+			for dict_item in mydict:
+				c = c+1
 				
-			except:
-				try:
-					insert_dict = 
-					decodeInsert(self,insert_dict,alt=False)
-				except:
+				qry,params,my_key = self.jsonDecoder(dict_item)
+				
+				qry_list.append(qry)
+				keys_list.append(my_key)
+				params_list.append(params)
+				
+				if params==None:
+					await output.append(con.execute(qry))
+				else:
 					try:
-						update_dict = 
+						myparam = params[0]
+						await output.append(con.execute(qry,*params))
 					except:
-						try:
-							update_dict = 
-						except:
-							try:
-								translate_dict = 
-							except:
-								qerrors.append(['9911','Unknown command',0])
+						await output.append(con.execute(qry,params))
+		else:
+			qry,params,my_key = self.jsonDecoder(mydict)
+			
+			if params==None:
+				output = await con.execute(qry)
+			else:
+				try:
+					myparam = params[0]
+					output = await con.execute(qry,*params)
+				except:
+					output = await con.execute(qry,params)
 		
-		qryx = 'INSERT INTO mytable (a) VALUES ($1, $2, $3);'
-		
-		await con.executemany(qryx,[list of tuples])
-		
+		return qry,params,my_key
 		#row = await conn.fetchrow( 'SELECT * FROM users WHERE name = $1', 'Bob')
 		#await conn.execute('INSERT INTO users(name, dob) VALUES($1, $2)', 'Bob', datetime.date(1984, 3, 1))
 		
@@ -210,7 +251,7 @@ class JSQL:
 			#MYSQL# COALESCE[COL,ReplacementVal]
 		"""
 		
-		
+		"""
 		qry = ""
 		errors = []
 		ops = ["SELECTALL","SELECT","UPDATE","DELETE","INSERT","TRUNCATE","CASE"]
@@ -291,7 +332,7 @@ class JSQL:
 					elif(key.upper()=="HAVING"):
 						
 					elif(key.upper()=="ORDERBY"):
-					
+					"""
 	def con(self, conf):
 		connection = psycopg2.connect(database = conf["db"], user = conf["user"], password = conf["password"], host = conf["host"], port = conf["port"])
 		return connection
