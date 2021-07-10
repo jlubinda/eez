@@ -69,21 +69,6 @@ class TestJSQL(unittest.TestCase):
 			}
 		}
 
-		jsql_qry2 = {"PROCESS":{
-			"DATA":{},
-			"USING":"method",
-			"FROM":"class",
-			"PARAMETERS":{"param1":"value1","param2":"value2","param3":"value3","param4":"value4"}
-			}
-		}
-
-		jsql_qry3 = {"PROCESS":{
-			"DATA":{},
-			"USING":"function",
-			"PARAMETERS":{"param1":"value1","param2":"value2","param3":"value3","param4":"value4"}
-			}
-		}
-
 		sql_qry1 = "SELECT * FROM table1 WHERE (col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 IN (SELECT * FROM table2 WHERE col5 = $4) GROUPBY col6,col7,col8 ORDERBY col9,col10,col11 DESC"
 		
 		qry_params_1 = ['value1','value2','value3','value4']
@@ -243,7 +228,7 @@ class TestJSQL(unittest.TestCase):
 		assert (qry_params_1 == params_1)
 
 	def test_select_2A(self):
-		jsql_qry1 = {"SELECTALL":{
+		jsql_qry1 = {"SELECT":{"COLS":['col1','col2','col3'],
 			"FROM":"table1",
 			"WHERE":[
 					['INIT ',{
@@ -267,7 +252,7 @@ class TestJSQL(unittest.TestCase):
 			}
 		}
 
-		sql_qry2 = "SELECT * FROM table1 WHERE col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 = $4) GROUPBY col6,col7,col8 ORDERBY col9,col10,col11 DESC"
+		sql_qry2 = "SELECT col1,col2,col3 FROM table1 WHERE col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 = $4) GROUPBY col6,col7,col8 ORDERBY col9,col10,col11 DESC"
 		
 		params_2 = ['value1','value2','value3','value4']
 		
@@ -280,7 +265,7 @@ class TestJSQL(unittest.TestCase):
 
 
 	def test_select_2B(self):
-		jsql_qry1 = {"SELECTALL":{
+		jsql_qry1 = {"SELECT":{"COLS":['col1','col2','col3'],
 			"FROM":"table1",
 			"WHERE":[
 					['INIT ',{
@@ -304,7 +289,7 @@ class TestJSQL(unittest.TestCase):
 			}
 		}
 
-		sql_qry2 = "SELECT * FROM table1 WHERE col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 = $4) GROUPBY col6,col7,col8 ORDERBY col9,col10,col11 DESC"
+		sql_qry2 = "SELECT col1,col2,col3 FROM table1 WHERE col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 = $4) GROUPBY col6,col7,col8 ORDERBY col9,col10,col11 DESC"
 		
 		params_2 = ['value1','value2','value3','value4']
 		
@@ -316,10 +301,40 @@ class TestJSQL(unittest.TestCase):
 
 	def test_process_1A(self):
 
+		jsql_qry1 = {"PROCESS":{
+			"DATA":['data_item_1/argument_1','data_item_2/argument_2','data_item_3/argument_3','data_item_4/argument_4','data_item_5/argument_5'],
+			"USING":"method",
+			"FROM":"module.submodule.myclass"
+			}
+		}
+
+
 		jsql_qry2 = {"PROCESS":{
-			"DATA":{"param1":"value1","param2":"value2","param3":"value3","param4":"value4"},
+			"DATA":['data_item_1/argument_1','data_item_2/argument_2','data_item_3/argument_3','data_item_4/argument_4','data_item_5/argument_5'],
 			"USING":"method",
 			"FROM":"module.submodule.myclass",
-			"WITH":""
+			"APPEND":{"PER_RESULT":{"PROCESS":{
+						"DATA_REFERENCE":[{"RES_VALUE_AT_KEY":"result_key1"},{"RES_VALUE_AT_KEY":"result_key2"},{"RES_VALUE_AT_KEY":"result_key3"}],
+						"DATA":['data_item_1/argument_1','data_item_2/argument_2'],
+						"USING":"method",
+						"FROM":"module.submodule.myclass"
+						}
+					}
+				}
+			}
+		}
+
+
+		jsql_qry3 = {"PROCESS":{
+			"DATA":['data_item_1/argument_1','data_item_2/argument_2','data_item_3/argument_3','data_item_4/argument_4','data_item_5/argument_5'],
+			"USING":"method",
+			"FROM":"module.submodule.myclass",
+			"APPEND":{"TO_RESULT":{"PROCESS":{
+						"DATA":['data_item_1/argument_1','data_item_2/argument_2','data_item_3/argument_3','data_item_4/argument_4','data_item_5/argument_5'],
+						"USING":"method",
+						"FROM":"module.submodule.myclass"
+						}
+					}
+				}
 			}
 		}

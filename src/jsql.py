@@ -48,8 +48,16 @@ class jsql:
 		my_class = locate(module_submodule_and_class) # eg "module.submodule.class"
 		instance = my_class()
 		return getattr(instance, mymethod)(*params) # my method is the function being called to process the data. params is a list containing the parameters which the method takes in.
-	
-	def jsonDecoder(self,mydict):
+		
+	def processor(self,my_dict):
+		module_submodule_and_class = my_dict["FROM"]
+		mymethod = my_dict["USING"]
+		params = my_dict["DATA"]
+		appendData = my_dict["APPEND"]
+		res = self.runProcess(module_submodule_and_class,mymethod,params)
+		
+		return res,appendData
+	def processKeyWords(self,mydict):
 		my_key = list(mydict.keys())[0]
 		my_dict = mydict[my_key]
 		
@@ -67,14 +75,40 @@ class jsql:
 			qry = self.decodeTruncate(my_dict)
 			params = None
 		elif my_key.upper()=="PROCESS":
-			module_submodule_and_class = my_dict["FROM"]
-			mymethod = my_dict["USING"]
+			qry = my_dict
 			params = my_dict["DATA"]
-			withData = my_dict["WITH"]
-			qry = self.runProcess(module_submodule_and_class,mymethod,params)
-			
-			if withData != None and withData != "":
-			else:
+		
+		return qry,params,my_dict,my_key.upper()
+		
+	def jsonDecoder(self,mydict):
+	
+			qry,params,my_dict,my_key = self.processKeyWords(mydict)
+			if my_key.upper()=="PROCESS":
+				res,appendData1 = self.processor(my_dict)
+				try:
+					to_result = appendData1["TO_RESULT"]
+					resx,params,my_dict = self.processKeyWords(mydict)
+					res = qry["result"]
+					output = {}
+					output["res_item"] = []
+					output["appended_item"] = []
+					a = -1
+					for item in res:
+						a = a+1
+						output["res_item"][a] = 
+						output["appended_item"][a] = 
+						qry2,params2,my_dict2,my_key2 = self.processKeyWords(item)
+						if my_key2.upper()=="PROCESS":
+							res2,appendData2 = self.processor(my_dict2)
+							output[a]["item"] = 
+							output[a]["item"] = res2
+						else:
+							output[a]["item"] = 
+							
+							
+						
+				except:
+				
 		
 		return qry,params,my_key
 		
@@ -374,4 +408,17 @@ class jsql:
 		output = await con.fetch(qry)
 		return output
 
+
+class tests:
+	def __init__(self):
+		pass
+	
+	def test1(self,param1,param2,param3):
+		return (param*(param2/param3))/param2
+	
+	def test2(self,param1,param2,param3):
+		return (param-(param2/param3))*param2
+	
+	def test3(self,param1,param2,param3):
+		return (param+(param2*param3))*param2
 
