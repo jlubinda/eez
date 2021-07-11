@@ -90,20 +90,19 @@ class jsql:
 					resx,params,my_dict = self.processKeyWords(mydict)
 					res = qry["result"]
 					output = {}
-					output["res_item"] = []
-					output["appended_item"] = []
+					output["res_items"] = []
+					output["appended_items"] = []
 					a = -1
 					for item in res:
 						a = a+1
-						output["res_item"][a] = 
-						output["appended_item"][a] = 
 						qry2,params2,my_dict2,my_key2 = self.processKeyWords(item)
 						if my_key2.upper()=="PROCESS":
 							res2,appendData2 = self.processor(my_dict2)
-							output[a]["item"] = 
-							output[a]["item"] = res2
+							output["res_items"].append(item)
+							output["appended_items"].append(res2)
 						else:
-							output[a]["item"] = 
+							output["res_items"].append(item)
+							output["appended_items"].append(res2)
 							
 							
 						

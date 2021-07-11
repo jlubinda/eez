@@ -301,15 +301,21 @@ class TestJSQL(unittest.TestCase):
 
 	def test_process_1A(self):
 
-		jsql_qry1 = {"PROCESS":{
-			"DATA":['data_item_1/argument_1','data_item_2/argument_2','data_item_3/argument_3','data_item_4/argument_4','data_item_5/argument_5'],
-			"USING":"method",
-			"FROM":"module.submodule.myclass"
+		jsql_qry = {"PROCESS":{
+			"DATA":[12,5,1.97],
+			"USING":"test1",
+			"FROM":"jsql.tests"
 			}
 		}
+		js = jsql()
+		res = js.processor(jsql_qry)
+		
+		assert(int(res)==6)
 
 
-		jsql_qry2 = {"PROCESS":{
+	def test_process_1B(self):
+
+		jsql_qry = {"PROCESS":{
 			"DATA":['data_item_1/argument_1','data_item_2/argument_2','data_item_3/argument_3','data_item_4/argument_4','data_item_5/argument_5'],
 			"USING":"method",
 			"FROM":"module.submodule.myclass",
@@ -317,7 +323,7 @@ class TestJSQL(unittest.TestCase):
 						"DATA_REFERENCE":[{"RES_VALUE_AT_KEY":"result_key1"},{"RES_VALUE_AT_KEY":"result_key2"},{"RES_VALUE_AT_KEY":"result_key3"}],
 						"DATA":['data_item_1/argument_1','data_item_2/argument_2'],
 						"USING":"method",
-						"FROM":"module.submodule.myclass"
+						"FROM":"jsql.tests.test2"
 						}
 					}
 				}
@@ -325,14 +331,17 @@ class TestJSQL(unittest.TestCase):
 		}
 
 
-		jsql_qry3 = {"PROCESS":{
+
+	def test_process_1C(self):
+
+		jsql_qry = {"PROCESS":{
 			"DATA":['data_item_1/argument_1','data_item_2/argument_2','data_item_3/argument_3','data_item_4/argument_4','data_item_5/argument_5'],
 			"USING":"method",
 			"FROM":"module.submodule.myclass",
 			"APPEND":{"TO_RESULT":{"PROCESS":{
 						"DATA":['data_item_1/argument_1','data_item_2/argument_2','data_item_3/argument_3','data_item_4/argument_4','data_item_5/argument_5'],
 						"USING":"method",
-						"FROM":"module.submodule.myclass"
+						"FROM":"jsql.tests.test3"
 						}
 					}
 				}
