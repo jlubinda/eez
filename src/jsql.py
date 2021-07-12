@@ -34,6 +34,12 @@ class jsql:
 	
 	def decodeSelectAll(self,mydict):
 		return "",""
+	
+	def decodeSelectAll2(self,mydict):
+		return "",""
+	
+	def decodeSelect2(self,mydict):
+		return "",""
 		
 	def fromDecode(self,my_input):
 		if type(my_input) is dict:
@@ -52,13 +58,64 @@ class jsql:
 			params = None
 		
 		return output,params
+		
+	def openingBracketProcessor(self,my_string):
+		if my_string[len(my_string)-1]=="(":
+			return "("
+		else:
+			return ""
+		
+	def closingBracketProcessor(self,my_string):
+		if my_string[0]==")":
+			return ")"
+		else:
+			return ""
+		
+		
+	def whereDecode(self,my_where_input):
+		output = ""
+		params_output = []
+		for item in my_where_input:
+			jsql_operator = item[0]
+			my_item_key = list(item[1].keys())[0]
+			
+			my_item_operator = item[1][my_item_key][0]
+			my_item_value = item[1][my_item_key][1]
+			
+			
+			if (type(my_item_value) is dict) or (type(my_item_value) is list) or (type(my_item_value) is tuple):
+			
+				my_key = list(my_item_value.keys())[0]
+				my_dict = my_item_value[my_key]
+				
+				if my_key.upper()=="SELECTALL":
+					qry,params = self.decodeSelectAll2(my_dict)
+				elif my_key.upper()=="SELECT":
+					qry,params = self.decodeSelect2(my_dict)
+				
+				output = output+self.openingBracketProcessor(jsql_operator)+self.closingBracketProcessor(jsql_operator)
+				output = output+self.sanitize(str(my_item_key))+" "
+				output = output+self.sanitize(str(my_item_operator))+" "
+				output = output+"("+qry+") "
+				output = output+self.closingBracketProcessor(jsql_operator)+self.openingBracketProcessor(jsql_operator)
+				
+				params_output = params_output+params
+			else:
+				output = output+self.openingBracketProcessor(jsql_operator)+self.closingBracketProcessor(jsql_operator)
+				output = output+self.sanitize(str(my_item_key))+" "
+				output = output+self.sanitize(str(my_item_operator))+" "
+				output = output+"'"+self.sanitize(str(my_item_value))+"' "
+				output = output+self.closingBracketProcessor(jsql_operator)+self.openingBracketProcessor(jsql_operator)
+		
+		return output,params_output
 	
 	def decodeSelect(self,mydict):
 		cols = mydict["COLS"]
 		
 		fromTxt,fromParams = self.fromDecode(self,mydict["FROM"])
+		whereTxt,whereParams = self.whereDecode(self,mydict["FROM"])
 		
-		qry = "SELECT "+self.sanitize(str(cols))+" "+fromTxt+""
+		qry = "SELECT "+self.sanitize(str(cols))+" "+fromTxt+""+whereTxt
 		return qry,""
 	
 	def decodeUpdate(self,mydict):
