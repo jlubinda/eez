@@ -7,6 +7,13 @@ from pydoc import locate
 class jsql:
 	def __init__(self):
 		pass
+
+	def sanitize(self, my_input, user_input=False): 
+		if user_input == False:
+			my_input = re.sub('[^A-Za-z0-9_,.]+', '', my_input)		  
+		else:
+			pass 
+		return my_input
 	
 	def operation(self, operator, x, y):
 		return {'add': lambda: x+y, 'sub': lambda: x-y, 'mul': lambda: x*y,'div':lambda: x/y,}.get(operator, lambda: "Not a valid operation")()
@@ -14,14 +21,45 @@ class jsql:
 	def getValue(self,mydict,key,alt=False):
 		return mydict.get(key,lambda: alt)()
 	
+	def checkString(self,my_string,my_list):
+		a=0
+		for item in my_list:
+			myString = item.lower()
+			if myString in my_string:
+				a = a+1
+		return a
+	
 	def decodeInsert(self,mydict):
 		return "",""
 	
 	def decodeSelectAll(self,mydict):
 		return "",""
+		
+	def fromDecode(self,my_input):
+		if type(my_input) is dict:
+		
+			my_key = list(my_input.keys())[0]
+			my_dict = my_input[my_key]
+			
+			if my_key.upper()=="SELECTALL":
+				qry,params = self.decodeSelectAll2(my_dict)
+			elif my_key.upper()=="SELECT":
+				qry,params = self.decodeSelect2(my_dict)
+			
+			output = "FROM ("+qry+") "
+		else:
+			output = "FROM "+self.sanitize(str(my_input))+" "
+			params = None
+		
+		return output,params
 	
 	def decodeSelect(self,mydict):
-		return "",""
+		cols = mydict["COLS"]
+		
+		fromTxt,fromParams = self.fromDecode(self,mydict["FROM"])
+		
+		qry = "SELECT "+self.sanitize(str(cols))+" "+fromTxt+""
+		return qry,""
 	
 	def decodeUpdate(self,mydict):
 		return "",""
@@ -57,6 +95,7 @@ class jsql:
 		res = self.runProcess(module_submodule_and_class,mymethod,params)
 		
 		return res,appendData
+		
 	def processKeyWords(self,mydict):
 		my_key = list(mydict.keys())[0]
 		my_dict = mydict[my_key]
@@ -390,13 +429,6 @@ class jsql:
 	def cur(self, con):
 		mycursor = con.cursor()
 		return mycursor
-
-	def sanitize(self, my_input, user_input=False): 
-		if user_input == False:
-			my_input = re.sub('[^A-Za-z0-9_,.]+', '', my_input)		  
-		else:
-			pass 
-		return my_input
 
 	def searchByJSONBCol(self,cur,tabl,my_col,my_key,my_value,specific_columns):
 		qry = "SELECT " +self.sanitize(str(specific_columns))+ "FROM " +self.sanitize(tabl)+ " WHERE ("+self.sanitize(my_col)+"->'"+self.sanitize(my_key)+"') = '"+sanitize(my_value)+"';" 
