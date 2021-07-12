@@ -23,8 +23,7 @@ class jsql:
 		theList = self.sanitize(my_list[0])
 		order = self.sanitize(my_list[1])
 		output = theList+" "+order
-		return output
-		
+		return output		
 	
 	def operation(self, operator, x, y):
 		return {'add': lambda: x+y, 'sub': lambda: x-y, 'mul': lambda: x*y,'div':lambda: x/y,}.get(operator, lambda: "Not a valid operation")()
