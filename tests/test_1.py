@@ -37,7 +37,7 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
-		qry_1,params_1,my_key = js.jsonDecoder(jsql_qry1)
+		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert (qry_1 == sql_qry1)
 
@@ -75,7 +75,7 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
-		qry_1,params_1,my_key = js.jsonDecoder(jsql_qry1)
+		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert (qry_params_1 == params_1)
 
@@ -110,7 +110,7 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
-		sql_qry1,params,my_key = js.jsonDecoder(jsql_qry1)
+		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert sql_qry1 == sql_qry2
 
@@ -147,7 +147,7 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
-		sql_qry1,params,my_key = js.jsonDecoder(jsql_qry1)
+		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert params == params_2
 
@@ -185,7 +185,7 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
-		qry_1,params_1,my_key = js.jsonDecoder(jsql_qry1)
+		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert (qry_1 == sql_qry1)
 
@@ -223,7 +223,7 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
-		qry_1,params_1,my_key = js.jsonDecoder(jsql_qry1)
+		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert (qry_params_1 == params_1)
 
@@ -258,7 +258,7 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
-		sql_qry1,params,my_key = js.jsonDecoder(jsql_qry1)
+		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert sql_qry1 == sql_qry2
 
@@ -295,7 +295,7 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
-		sql_qry1,params,my_key = js.jsonDecoder(jsql_qry1)
+		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert params == params_2
 
@@ -308,28 +308,37 @@ class TestJSQL(unittest.TestCase):
 			}
 		}
 		js = jsql()
-		res = js.processor(jsql_qry)
+		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry)
 		
-		assert(int(res)==6)
+		assert(int(output)==6)
 
 
 	def test_process_1B(self):
 
 		jsql_qry = {"PROCESS":{
-			"DATA":['data_item_1/argument_1','data_item_2/argument_2','data_item_3/argument_3','data_item_4/argument_4','data_item_5/argument_5'],
-			"USING":"method",
-			"FROM":"module.submodule.myclass",
+			"DATA":[[1,3,5,7,9,11,13,15,17,19,21],[2,4,6,8,10,12,14,16,18,20,22]],
+			"USING":"test2",
+			"FROM":"jsql.tests",
 			"APPEND":{"PER_RESULT":{"PROCESS":{
-						"DATA_REFERENCE":[{"RES_VALUE_AT_KEY":"result_key1"},{"RES_VALUE_AT_KEY":"result_key2"},{"RES_VALUE_AT_KEY":"result_key3"}],
-						"DATA":['data_item_1/argument_1','data_item_2/argument_2'],
-						"USING":"method",
-						"FROM":"jsql.tests.test2"
+						"DATA_REFERENCE":{"RES_LIST_OUTPUT":"all"},
+						"DATA":[21,42,63,84,105,126,147,168,189,210,222],
+						"USING":"test3",
+						"FROM":"jsql.tests"
 						}
 					}
 				}
 			}
 		}
+		
+		js = jsql()
+		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry)
+		
+		assert([3.0, 138.0, 885.0, 3108.0, 8055.0, 17358.0, 33033.0, 57480.0, 93483.0, 144210.0, 213213.0]==output)
+		
 
+	#"DATA_REFERENCE":{"RES_LIST_VALUE_BY_KEY":["result_key1","result_key2","result_key3","result_key4"]}
+	#"DATA_REFERENCE":{"RES_LIST_OUTPUT":"all"}
+	#"DATA_REFERENCE":{"RES_LIST_OUTPUT":3:9}
 
 
 	def test_process_1C(self):

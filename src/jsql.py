@@ -82,34 +82,47 @@ class jsql:
 		
 	def jsonDecoder(self,mydict):
 	
-			qry,params,my_dict,my_key = self.processKeyWords(mydict)
-			if my_key.upper()=="PROCESS":
-				res,appendData1 = self.processor(my_dict)
+		qry,params,my_dict,my_key = self.processKeyWords(mydict)
+		if my_key.upper()=="PROCESS":
+			res,appendData1 = self.processor(my_dict)
+			try:
+				to_result = appendData1["TO_RESULT"]
+				resx,paramsx,my_dictx = self.processKeyWords(to_result)
+				res = qry
+				output = []
+				#output["res_items"] = []
+				#output["appended_items"] = []
+				a = -1
+				for item in res:
+					a = a+1
+					qry2,params2,my_dict2,my_key2 = self.processKeyWords(item)
+					if my_key2.upper()=="PROCESS":
+						res2,appendData2 = self.processor(my_dict2)
+						output.append({"res_items":item,"appended_items":res2})
+					else:
+						output.append({"res_items":item,"appended_items":qry2})
+			except:
 				try:
-					to_result = appendData1["TO_RESULT"]
-					resx,params,my_dict = self.processKeyWords(mydict)
-					res = qry["result"]
-					output = {}
-					output["res_items"] = []
-					output["appended_items"] = []
+					per_result = appendData1["PER_RESULT"]
+					resx,params,my_dict = self.processKeyWords(per_result)
+					res = qry
+					output = []
+					#output["res_items"] = []
+					#output["appended_items"] = []
 					a = -1
 					for item in res:
 						a = a+1
 						qry2,params2,my_dict2,my_key2 = self.processKeyWords(item)
 						if my_key2.upper()=="PROCESS":
 							res2,appendData2 = self.processor(my_dict2)
-							output["res_items"].append(item)
-							output["appended_items"].append(res2)
+							output.append({"res_items":item,"appended_items":res2})
 						else:
-							output["res_items"].append(item)
-							output["appended_items"].append(res2)
-							
-							
-						
+							output.append({"res_items":item,"appended_items":qry2})
 				except:
-				
-		
-		return qry,params,my_key
+					output = None
+		else:
+			output = None
+		return qry,params,my_key,output
 		
 		
 	async def runQuery(self,con,mydict):
@@ -128,7 +141,7 @@ class jsql:
 			for dict_item in mydict:
 				c = c+1
 				
-				qry,params,my_key = self.jsonDecoder(dict_item)
+				qry,params,my_key,output = self.jsonDecoder(dict_item)
 				
 				qry_list.append(qry)
 				keys_list.append(my_key)
@@ -143,7 +156,7 @@ class jsql:
 					except:
 						await output.append(con.execute(qry,params))
 		else:
-			qry,params,my_key = self.jsonDecoder(mydict)
+			qry,params,my_key,output = self.jsonDecoder(mydict)
 			
 			if params==None:
 				output = await con.execute(qry)
@@ -154,7 +167,7 @@ class jsql:
 				except:
 					output = await con.execute(qry,params)
 		
-		return qry,params,my_key
+		return qry,params,my_key,output
 		#row = await conn.fetchrow( 'SELECT * FROM users WHERE name = $1', 'Bob')
 		#await conn.execute('INSERT INTO users(name, dob) VALUES($1, $2)', 'Bob', datetime.date(1984, 3, 1))
 		
@@ -415,9 +428,26 @@ class tests:
 	def test1(self,param1,param2,param3):
 		return (param*(param2/param3))/param2
 	
-	def test2(self,param1,param2,param3):
-		return (param-(param2/param3))*param2
+	def test2(self,param1,param2):
+
+		outlist = []
+		for i in range(len(param1)):
+			out1 = param1[i]
+			out2 = param2[i]
+			outlist.append(out1*out2)
+
+		return outlist
 	
 	def test3(self,param1,param2,param3):
+		
+		outlist = []
+		for i in range(len(param1)):
+			out1 = param1[i]
+			out2 = param2[i]
+			outlist.append((out1-0.5)*out2)
+		
+		return outlist
+	
+	def test4(self,param1,param2,param3):
 		return (param+(param2*param3))*param2
 
