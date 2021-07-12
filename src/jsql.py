@@ -112,8 +112,8 @@ class jsql:
 	def decodeSelect(self,mydict):
 		cols = mydict["COLS"]
 		
-		fromTxt,fromParams = self.fromDecode(self,mydict["FROM"])
-		whereTxt,whereParams = self.whereDecode(self,mydict["FROM"])
+		fromTxt,fromParams = self.fromDecode(mydict["FROM"])
+		whereTxt,whereParams = self.whereDecode(mydict["FROM"])
 		
 		qry = "SELECT "+self.sanitize(str(cols))+" "+fromTxt+""+whereTxt
 		return qry,""
