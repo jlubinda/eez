@@ -15,6 +15,17 @@ class jsql:
 			pass 
 		return my_input
 	
+	def groupbyDecode(self, my_list):
+		output = self.sanitize(my_list)
+		return output
+	
+	def orderbyDecode(self, my_list):
+		theList = self.sanitize(my_list[0])
+		order = self.sanitize(my_list[1])
+		output = theList+" "+order
+		return output
+		
+	
 	def operation(self, operator, x, y):
 		return {'add': lambda: x+y, 'sub': lambda: x-y, 'mul': lambda: x*y,'div':lambda: x/y,}.get(operator, lambda: "Not a valid operation")()
 	
@@ -77,7 +88,7 @@ class jsql:
 		params_output = []
 		for item in my_where_input:
 			jsql_operator = item[0]
-			my_item_key = list(item[1].keys())[0]
+			my_item_key = list(item[1].keys())[0] ## error with dictionary index on this line
 			
 			my_item_operator = item[1][my_item_key][0]
 			my_item_value = item[1][my_item_key][1]
@@ -110,13 +121,16 @@ class jsql:
 		return output,params_output
 	
 	def decodeSelect(self,mydict):
-		cols = mydict["COLS"]
-		
+		cols = self.sanitize(str(mydict["COLS"]))
 		fromTxt,fromParams = self.fromDecode(mydict["FROM"])
 		whereTxt,whereParams = self.whereDecode(mydict["FROM"])
+		groupby = self.groupbyDecode(mydict["GROUPBY"])
+		orderby = self.orderbyDecode(mydict["ORDERBY"])
 		
-		qry = "SELECT "+self.sanitize(str(cols))+" "+fromTxt+""+whereTxt
-		return qry,""
+		params = fromParams+whereParams
+		
+		qry = "SELECT "+cols+""+fromTxt+""+whereTxt+""+groupby+""+orderby
+		return qry,params
 	
 	def decodeUpdate(self,mydict):
 		return "",""
