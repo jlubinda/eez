@@ -122,7 +122,7 @@ class jsql:
 	def decodeSelect(self,mydict):
 		cols = self.sanitize(str(mydict["COLS"]))
 		fromTxt,fromParams = self.fromDecode(mydict["FROM"])
-		whereTxt,whereParams = self.whereDecode(mydict["WHERE"])
+		whereTxt,whereParams = self.whereDecode(mydict["FROM"])
 		groupby = self.groupbyDecode(mydict["GROUPBY"])
 		orderby = self.orderbyDecode(mydict["ORDERBY"])
 		
