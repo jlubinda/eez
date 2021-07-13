@@ -24,6 +24,18 @@ class jsql:
 		order = self.sanitize(my_list[1])
 		output = theList+" "+order
 		return output		
+		
+	def openingBracketProcessor(self,my_string):
+		if my_string[len(my_string)-1]=="(":
+			return "("
+		else:
+			return ""
+		
+	def closingBracketProcessor(self,my_string):
+		if my_string[0]==")":
+			return ")"
+		else:
+			return ""
 	
 	def operation(self, operator, x, y):
 		return {'add': lambda: x+y, 'sub': lambda: x-y, 'mul': lambda: x*y,'div':lambda: x/y,}.get(operator, lambda: "Not a valid operation")()
@@ -49,7 +61,16 @@ class jsql:
 		return "",""
 	
 	def decodeSelect2(self,mydict):
-		return "",""
+		cols = self.sanitize(str(mydict["COLS"]))
+		fromTxt,fromParams = self.fromDecode(mydict["FROM"])
+		whereTxt,whereParams = self.whereDecode(mydict["FROM"])
+		groupby = self.groupbyDecode(mydict["GROUPBY"])
+		orderby = self.orderbyDecode(mydict["ORDERBY"])
+		
+		params = fromParams+whereParams
+		
+		qry = "SELECT "+cols+""+fromTxt+""+whereTxt+""+groupby+""+orderby
+		return qry,params
 		
 	def fromDecode(self,my_input):
 		if type(my_input) is dict:
@@ -68,18 +89,6 @@ class jsql:
 			params = None
 		
 		return output,params
-		
-	def openingBracketProcessor(self,my_string):
-		if my_string[len(my_string)-1]=="(":
-			return "("
-		else:
-			return ""
-		
-	def closingBracketProcessor(self,my_string):
-		if my_string[0]==")":
-			return ")"
-		else:
-			return ""
 		
 		
 	def whereDecode(self,my_where_input):
@@ -122,7 +131,7 @@ class jsql:
 	def decodeSelect(self,mydict):
 		cols = self.sanitize(str(mydict["COLS"]))
 		fromTxt,fromParams = self.fromDecode(mydict["FROM"])
-		whereTxt,whereParams = self.whereDecode(mydict["FROM"])
+		whereTxt,whereParams = self.whereDecode(mydict["WHERE"])
 		groupby = self.groupbyDecode(mydict["GROUPBY"])
 		orderby = self.orderbyDecode(mydict["ORDERBY"])
 		
