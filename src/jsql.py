@@ -174,8 +174,11 @@ class jsql:
 						else:
 							output += " "+self.operationProcesser(jsql_operator)
 							
-						output += self.closingBracketProcessor(jsql_operator)
-						output += " "+self.openingBracketProcessor(jsql_operator)
+						if self.operationProcesser(jsql_operator) == "":
+							output += self.closingBracketProcessor(jsql_operator)
+						else:
+							output += self.closingBracketProcessor(jsql_operator)
+							output += " "+self.openingBracketProcessor(jsql_operator)
 					else:
 						output += " "+self.operationProcesser(jsql_operator)
 					
@@ -272,8 +275,11 @@ class jsql:
 						else:
 							output += " "+self.operationProcesser(jsql_operator)
 							
-						output += self.closingBracketProcessor(jsql_operator)
-						output += " "+self.openingBracketProcessor(jsql_operator)
+						if self.operationProcesser(jsql_operator) == "":
+							output += self.closingBracketProcessor(jsql_operator)
+						else:
+							output += self.closingBracketProcessor(jsql_operator)
+							output += " "+self.openingBracketProcessor(jsql_operator)
 					else:
 						output += " "+self.operationProcesser(jsql_operator)
 					
