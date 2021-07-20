@@ -31,16 +31,16 @@ class TestJSQL(unittest.TestCase):
 			}
 		}
 
-		sql_qry1 = "SELECT * FROM table1 WHERE (col1 = 'value1' AND (col2 LIKE 'value2' OR col3 = 'value3' NOT col4 IN (SELECT * FROM table2 WHERE col5 = 'value4') GROUP BY col6,col7,col8 ORDER BY col9,col10,col11 DESC"
+		sql_qry1 = "SELECT * FROM table1 WHERE (col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 IN (SELECT * FROM table2 WHERE col5 = $4))) GROUP BY col6,col7,col8 ORDER BY col9,col10,col11 DESC"
 		
-		qry_parqry_params_1ams = ()
+		params = ['value1','value2','value3','value4']
 		
 		js = jsql()
 		
 		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert (qry_1 == sql_qry1)
-	"""
+	
 	def test_selectall_1B(self):
 		jsql_qry1 = {"SELECTALL":{
 			"FROM":"table1",
@@ -69,7 +69,7 @@ class TestJSQL(unittest.TestCase):
 			}
 		}
 
-		sql_qry1 = "SELECT * FROM table1 WHERE (col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 IN (SELECT * FROM table2 WHERE col5 = $4) GROUP BY col6,col7,col8 ORDER BY col9,col10,col11 DESC"
+		sql_qry1 = "SELECT * FROM table1 WHERE (col1 = $1 AND (col2 LIKE $2 OR col3 = $3) NOT col4 IN (SELECT * FROM table2 WHERE col5 = $4)) GROUP BY col6,col7,col8 ORDER BY col9,col10,col11 DESC"
 		
 		qry_params_1 = ['value1','value2','value3','value4']
 		
@@ -147,9 +147,11 @@ class TestJSQL(unittest.TestCase):
 		
 		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry1)
 		
+		print(params)
+		
 		assert params == params_2
 
-
+	
 	##################################
 	def test_select_1A(self):
 		jsql_qry1 = {"SELECT":{"COLS":['col1','col2','col3'],
@@ -179,7 +181,7 @@ class TestJSQL(unittest.TestCase):
 			}
 		}
 
-		sql_qry1 = "SELECT col1,col2,col3 FROM table1 WHERE (col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 IN (SELECT * FROM table2 WHERE col5 = $4) GROUP BY col6,col7,col8 ORDER BY col9,col10,col11 DESC"
+		sql_qry1 = "SELECT col1,col2,col3 FROM table1 WHERE (col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 IN (SELECT * FROM table2 WHERE col5 = $4))) GROUP BY col6,col7,col8 ORDER BY col9,col10,col11 DESC"
 		
 		js = jsql()
 		
@@ -215,7 +217,7 @@ class TestJSQL(unittest.TestCase):
 			}
 		}
 
-		sql_qry1 = "SELECT col1,col2,col3 FROM table1 WHERE (col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 IN (SELECT * FROM table2 WHERE col5 = $4) GROUP BY col6,col7,col8 ORDER BY col9,col10,col11 DESC"
+		sql_qry1 = "SELECT col1,col2,col3 FROM table1 WHERE (col1 = $1 AND (col2 LIKE $2 OR col3 = $3) NOT col4 IN (SELECT * FROM table2 WHERE col5 = $4)) GROUP BY col6,col7,col8 ORDER BY col9,col10,col11 DESC"
 		
 		qry_params_1 = ['value1','value2','value3','value4']
 		
@@ -354,4 +356,4 @@ class TestJSQL(unittest.TestCase):
 				}
 			}
 		}
-	"""
+	

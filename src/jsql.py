@@ -91,6 +91,24 @@ class jsql:
 		return output,params
 		
 	def fromDecode3(self,my_input,params=[]):
+		
+		if type(my_input) is dict:
+		
+			my_key = list(my_input.keys())[0]
+			my_dict = my_input[my_key]
+			
+			if my_key.upper()=="SELECTALL":
+				qry,params = self.decodeSelectAll4(my_dict,params)
+			elif my_key.upper()=="SELECT":
+				qry,params = self.decodeSelect4(my_dict,params)
+			
+			output = "FROM ("+qry+") "
+		else:
+			output = "FROM "+self.sanitize(str(my_input))+" "
+		
+		return output,params
+		
+	def fromDecode4(self,my_input,params=[]):
 		if type(my_input) is dict:
 			output = ""
 		else:
@@ -298,10 +316,10 @@ class jsql:
 	
 	def decodeSelectAll(self,mydict,params=[]):
 		fromTxt,params = self.fromDecode(mydict["FROM"],params)
-		
+		params2 = []
 		try:
 			myWhere = mydict["WHERE"]
-			whereTxt,params = self.whereDecode(myWhere,params)
+			whereTxt,params2 = self.whereDecode(myWhere,params2)
 		except:
 			whereTxt = ""
 		
@@ -319,8 +337,7 @@ class jsql:
 		
 		
 		qry = "SELECT * "+fromTxt+""+whereTxt+""+groupby+""+orderby
-		print("QRY: "+qry)
-		
+		params = params+params2
 		return qry,params
 	
 	def decodeSelectAll2(self,mydict,params=[]):
