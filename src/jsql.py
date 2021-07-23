@@ -7,7 +7,7 @@ from pydoc import locate
 class jsql:
 	def __init__(self):
 		pass
-
+	
 	def sanitize(self, my_input, user_input=False): 
 		if user_input == False:
 			my_input = re.sub('[^A-Za-z0-9_,.]+', '', my_input)	  
@@ -37,6 +37,26 @@ class jsql:
 			return ")"
 		else:
 			return ""
+
+	def outputClosingBracketMatcher(self,my_input_string): 
+		openingBracketCount = 0
+		closingBracketCount = 0
+		output = ""
+		for item in my_input_string:
+			if item == "(":
+				openingBracketCount += 1
+			elif item == ")":
+				closingBracketCount += 1
+			else:
+				pass
+
+		if openingBracketCount > closingBracketCount:
+			output += my_input_string + ")"
+		elif openingBracketCount == closingBracketCount:
+			output += my_input_string
+		else:
+			output += my_input_string
+		return output
 		
 	def operationProcesser(self,my_string):
 		return self.sanitize(my_string)
@@ -125,9 +145,9 @@ class jsql:
 			if a<len(my_where_input):
 				if a==1:
 					output += "WHERE"
+
 				
-				
-				my_item_key = list(item[1].keys())[0] ## error with dictionary index on this line
+				my_item_key = list(item[1].keys())[0] 
 				
 				my_item_operator = item[1][my_item_key][0]
 				
@@ -146,7 +166,7 @@ class jsql:
 					
 					if jsql_operator[0]==")" or jsql_operator[0]=="(":
 						output += self.closingBracketProcessor(jsql_operator)
-						output += " "+self.openingBracketProcessor(jsql_operator)
+						output += ""+self.openingBracketProcessor(jsql_operator) ####latest change
 						
 						if output[len(output)-1]=="(":
 							output += self.operationProcesser(jsql_operator)
@@ -162,6 +182,9 @@ class jsql:
 							
 						output += self.closingBracketProcessor(jsql_operator)
 						output += " "+self.openingBracketProcessor(jsql_operator)
+
+					else:
+						output += " " + self.operationProcesser(jsql_operator)
 					
 					if output[len(output)-1]=="(":
 						output += self.sanitize(str(my_item_key))+" "
@@ -173,7 +196,7 @@ class jsql:
 							
 					
 					output += str(my_item_operator)+" "
-					output += "("+qry+") "
+					output += "("+qry+")"
 					
 				else:
 					if jsql_operator[0]==")" or jsql_operator[0]=="(":
@@ -191,9 +214,14 @@ class jsql:
 							output += self.operationProcesser(jsql_operator)
 						else:
 							output += " "+self.operationProcesser(jsql_operator)
-							
-						output += self.closingBracketProcessor(jsql_operator)
-						output += " "+self.openingBracketProcessor(jsql_operator)
+
+						if self.operationProcesser(jsql_operator) == "":
+							output += self.closingBracketProcessor(jsql_operator)
+							output += self.openingBracketProcessor(jsql_operator) 
+						else:
+							output += self.closingBracketProcessor(jsql_operator)
+							output += " "+self.openingBracketProcessor(jsql_operator)
+
 					else:
 						output += " "+self.operationProcesser(jsql_operator)
 					
@@ -210,7 +238,10 @@ class jsql:
 					params.append(my_item_value)
 			else:
 				output += self.closingBracketProcessor(jsql_operator)+self.openingBracketProcessor(jsql_operator)
-		
+				output = self.outputClosingBracketMatcher(output)
+
+		output = self.outputClosingBracketMatcher(output)
+
 		return output,params
 		
 	def whereDecode2(self,my_where_input,params=[]):
@@ -225,7 +256,7 @@ class jsql:
 					output += "WHERE"
 				
 				
-				my_item_key = list(item[1].keys())[0] ## error with dictionary index on this line
+				my_item_key = list(item[1].keys())[0] 
 				
 				my_item_operator = item[1][my_item_key][0]
 				
@@ -260,6 +291,9 @@ class jsql:
 							
 						output += self.closingBracketProcessor(jsql_operator)
 						output += " "+self.openingBracketProcessor(jsql_operator)
+
+					else:
+						output += " " + self.operationProcesser(jsql_operator) 
 					
 					if output[len(output)-1]=="(":
 						output += self.sanitize(str(my_item_key))+" "
@@ -271,7 +305,7 @@ class jsql:
 							
 					
 					output += str(my_item_operator)+" "
-					output += "("+qry+") "
+					output += "("+qry+")"
 					
 				else:
 					if jsql_operator[0]==")" or jsql_operator[0]=="(":
@@ -290,8 +324,13 @@ class jsql:
 						else:
 							output += " "+self.operationProcesser(jsql_operator)
 							
-						output += self.closingBracketProcessor(jsql_operator)
-						output += " "+self.openingBracketProcessor(jsql_operator)
+						if self.operationProcesser(jsql_operator) == "":
+							output += self.closingBracketProcessor(jsql_operator)
+							output += self.openingBracketProcessor(jsql_operator) 
+						else:
+							output += self.closingBracketProcessor(jsql_operator)
+							output += " "+self.openingBracketProcessor(jsql_operator)
+
 					else:
 						output += " "+self.operationProcesser(jsql_operator)
 					
@@ -412,7 +451,7 @@ class jsql:
 			orderby = ""
 		
 		
-		qry = "SELECT "+cols+""+fromTxt+""+whereTxt+""+groupby+""+orderby
+		qry = "SELECT "+cols+" "+fromTxt+""+whereTxt+""+groupby+""+orderby
 		return qry,params
 	
 	def decodeSelect2(self,mydict,params=[]):
@@ -438,7 +477,7 @@ class jsql:
 			orderby = ""
 		
 		
-		qry = "SELECT "+cols+""+fromTxt+""+whereTxt+""+groupby+""+orderby
+		qry = "SELECT "+cols+" "+fromTxt+""+whereTxt+""+groupby+""+orderby
 		return qry,params
 	
 	def decodeSelect(self,mydict,params=[]):
@@ -464,7 +503,7 @@ class jsql:
 			orderby = ""
 		
 		
-		qry = "SELECT "+cols+""+fromTxt+""+whereTxt+""+groupby+""+orderby
+		qry = "SELECT "+cols+" "+fromTxt+""+whereTxt+""+groupby+""+orderby
 		return qry,params
 	
 	def decodeUpdate(self,mydict,params=[]):
@@ -495,11 +534,16 @@ class jsql:
 		
 	def processor(self,my_dict):
 		module_submodule_and_class = my_dict["FROM"]
+		
 		mymethod = my_dict["USING"]
 		params = my_dict["DATA"]
-		appendData = my_dict["APPEND"]
+		try:
+			appendData = my_dict["APPEND"]
+		except:
+			appendData = ""
 		res = self.runProcess(module_submodule_and_class,mymethod,params)
 		
+		#print("APPEND: "+str(appendData))
 		return res,appendData
 		
 	def processKeyWords(self,mydict):
@@ -525,13 +569,14 @@ class jsql:
 			params = my_dict["DATA"]
 		
 		return qry,params,my_dict,my_key.upper()
-		
+	
 	def jsonDecoder(self,mydict):
 	
 		qry,params,my_dict,my_key = self.processKeyWords(mydict)
 		
 		if my_key.upper()=="PROCESS":
 			res,appendData1 = self.processor(my_dict)
+			print("appendData1: "+str(appendData1))
 			try:
 				to_result = appendData1["TO_RESULT"]
 				resx,paramsx,my_dictx = self.processKeyWords(to_result)
@@ -548,6 +593,7 @@ class jsql:
 						output.append({"res_items":item,"appended_items":res2})
 					else:
 						output.append({"res_items":item,"appended_items":qry2})
+				#print("TO_RESULT")
 			except:
 				try:
 					per_result = appendData1["PER_RESULT"]
@@ -565,8 +611,10 @@ class jsql:
 							output.append({"res_items":item,"appended_items":res2})
 						else:
 							output.append({"res_items":item,"appended_items":qry2})
+					#print("PER_RESULT")
 				except:
-					output = None
+					output = res
+					#print("JUST RESULT (No Nesting)")
 		else:
 			output = None
 		return qry,params,my_key,output
@@ -866,7 +914,7 @@ class tests:
 		pass
 	
 	def test1(self,param1,param2,param3):
-		return (param*(param2/param3))/param2
+		return (param1*(param2/param3))/param2
 	
 	def test2(self,param1,param2):
 
@@ -878,16 +926,18 @@ class tests:
 
 		return outlist
 	
-	def test3(self,param1,param2,param3):
+	def test3(self,param1,param2):
 		
 		outlist = []
 		for i in range(len(param1)):
 			out1 = param1[i]
 			out2 = param2[i]
-			outlist.append((out1-0.5)*out2)
+			outcome = (out1-0.5)*out2
+			print("outcome:"+str(outcome))
+			outlist.append(outcome)
+		print("\n\n")
 		
 		return outlist
 	
 	def test4(self,param1,param2,param3):
-		return (param+(param2*param3))*param2
-
+		return (param1+(param2*param3))*param2
