@@ -204,11 +204,11 @@ class TestJSQL(unittest.TestCase):
 					}],
 					['NOT',{
 						"col4":['IN',{"SELECTALL":{"FROM":"table2","WHERE":[
-						['INIT',{"col5":['=','value4']},['END']]
+						['INIT',{"col5":['=','value4']}],['END']
 						]
 						}}]
 					}],
-					[') END']
+					[')) END']
 				],
 			"GROUPBY":["col6","col7","col8"],
 			"ORDERBY":[
@@ -243,11 +243,11 @@ class TestJSQL(unittest.TestCase):
 					}],
 					['NOT',{
 						"col4":['IN',{"SELECTALL":{"FROM":"table2","WHERE":[
-						['INIT',{"col5":['=','value4']}]
+						['INIT',{"col5":['=','value4']}],['END']
 						]
 						}}]
 					}],
-					[') END']
+					[')) END']
 				],
 			"GROUPBY":["col6","col7","col8"],
 			"ORDERBY":[
@@ -265,7 +265,8 @@ class TestJSQL(unittest.TestCase):
 		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert (qry_params_1 == params_1)
-
+	
+	
 	def test_select_2A(self):
 		jsql_qry1 = {"SELECT":{"COLS":['col1','col2','col3'],
 			"FROM":"table1",
@@ -302,7 +303,7 @@ class TestJSQL(unittest.TestCase):
 		assert sql_qry1 == sql_qry2
 
 
-
+	
 	def test_select_2B(self):
 		jsql_qry1 = {"SELECT":{"COLS":['col1','col2','col3'],
 			"FROM":"table1",
