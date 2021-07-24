@@ -172,7 +172,7 @@ class jsql:
 					elif my_key.upper()=="SELECT":
 						qry,params_a = self.decodeSelect2(my_dict,(len(params)+count_params))
 						
-					params+params_a
+					params=params+params_a
 					
 					if jsql_operator[0]==")" or jsql_operator[0]=="(":
 						output += self.closingBracketProcessor(jsql_operator)
@@ -284,7 +284,7 @@ class jsql:
 					elif my_key.upper()=="SELECT":
 						qry,params_a = self.decodeSelect3(my_dict,(len(params)+count_params))
 					
-					params+params_a
+					params=params+params_a
 					
 					if jsql_operator[0]==")" or jsql_operator[0]=="(":
 						output += self.closingBracketProcessor(jsql_operator)
@@ -393,7 +393,7 @@ class jsql:
 					elif my_key.upper()=="SELECT":
 						qry,params_a = self.decodeSelect4(my_dict,(len(params)+count_params))
 					
-					params+params_a
+					params=params+params_a
 					
 					if jsql_operator[0]==")" or jsql_operator[0]=="(":
 						output += self.closingBracketProcessor(jsql_operator)
