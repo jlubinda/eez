@@ -36,7 +36,7 @@ class TestJSQL(unittest.TestCase):
 		params = ['value1','value2','value3','value4']
 		
 		js = jsql()
-		
+		params_1 = []
 		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert (qry_1 == sql_qry1)
@@ -75,6 +75,7 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
+		params_1 = []
 		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert (qry_params_1 == params_1)
@@ -113,6 +114,8 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
+		params_1 = []
+		
 		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert (qry_1 == sql_qry1)
@@ -147,8 +150,9 @@ class TestJSQL(unittest.TestCase):
 		params_2 = ['value1','value2','value3','value4']
 		
 		js = jsql()
+		params_1 = []
 		
-		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry1)
+		sql_qry1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert sql_qry1 == sql_qry2
 	
@@ -182,10 +186,11 @@ class TestJSQL(unittest.TestCase):
 		params_2 = ['value1','value2','value3','value4']
 		
 		js = jsql()
+		params_1 = []
 		
-		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry1)
+		sql_qry1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
-		assert params == params_2
+		assert params_1 == params_2
 
 	
 	##################################
@@ -219,14 +224,18 @@ class TestJSQL(unittest.TestCase):
 
 		sql_qry1 = "SELECT col1,col2,col3 FROM table1 WHERE (col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 IN (SELECT * FROM table2 WHERE col5 = $4))) GROUP BY col6,col7,col8 ORDER BY col9,col10,col11 DESC"
 		
+		
 		js = jsql()
+		
+		params_1 = []
 		
 		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
-		#print(qry_1)
+		print(qry_1)
 		
 		assert (qry_1 == sql_qry1)
 		
+	
 	
 	def test_select_1B(self):
 		jsql_qry1 = {"SELECT":{"COLS":['col1','col2','col3'],
@@ -262,7 +271,11 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
+		params_1 = []
+		
 		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
+		
+		print("params_1: "+str(params_1))
 		
 		assert (qry_params_1 == params_1)
 	
@@ -298,7 +311,9 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
-		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry1)
+		params_1 = []
+		
+		sql_qry1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert sql_qry1 == sql_qry2
 
@@ -335,9 +350,11 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		
-		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry1)
+		params_1 = []
 		
-		assert params == params_2
+		sql_qry1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
+		
+		assert params_1 == params_2
 	
 	def test_process_1A(self):
 

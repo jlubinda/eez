@@ -75,42 +75,7 @@ class jsql:
 				a = a+1
 		return a
 		
-	def fromDecode(self,my_input,params=[]):
-		if type(my_input) is dict:
-		
-			my_key = list(my_input.keys())[0]
-			my_dict = my_input[my_key]
-			
-			if my_key.upper()=="SELECTALL":
-				qry,params = self.decodeSelectAll2(my_dict,params)
-			elif my_key.upper()=="SELECT":
-				qry,params = self.decodeSelect2(my_dict,params)
-			
-			output = "FROM ("+qry+") "
-		else:
-			output = "FROM "+self.sanitize(str(my_input))+" "
-		
-		return output,params
-		
-	def fromDecode2(self,my_input,params=[]):
-		params_len = len(params)
-		if type(my_input) is dict:
-		
-			my_key = list(my_input.keys())[0]
-			my_dict = my_input[my_key]
-			
-			if my_key.upper()=="SELECTALL":
-				qry,params = self.decodeSelectAll3(my_dict,params)
-			elif my_key.upper()=="SELECT":
-				qry,params = self.decodeSelect3(my_dict,params)
-			
-			output = "FROM ("+qry+") "
-		else:
-			output = "FROM "+self.sanitize(str(my_input))+" "
-		
-		return output,params
-		
-	def fromDecode3(self,my_input,params=[]):
+	def fromDecode(self,my_input,count_params=0):
 		
 		if type(my_input) is dict:
 		
@@ -118,26 +83,69 @@ class jsql:
 			my_dict = my_input[my_key]
 			
 			if my_key.upper()=="SELECTALL":
-				qry,params = self.decodeSelectAll4(my_dict,params)
+				qry,params = self.decodeSelectAll2(my_dict,count_params)
 			elif my_key.upper()=="SELECT":
-				qry,params = self.decodeSelect4(my_dict,params)
+				qry,params = self.decodeSelect2(my_dict,count_params)
+				
+			output = "FROM ("+qry+") "
+		else:
+			output = "FROM "+self.sanitize(str(my_input))+" "
+			params = []
+		
+		return output,params
+		
+	def fromDecode2(self,my_input,count_params=0):
+		
+		if type(my_input) is dict:
+		
+			my_key = list(my_input.keys())[0]
+			my_dict = my_input[my_key]
+			
+			if my_key.upper()=="SELECTALL":
+				qry,params = self.decodeSelectAll3(my_dict,count_params)
+			elif my_key.upper()=="SELECT":
+				qry,params = self.decodeSelect3(my_dict,count_params)
+				
+			output = "FROM ("+qry+") "
+		else:
+			output = "FROM "+self.sanitize(str(my_input))+" "
+			params = []
+		
+		return output,params
+		
+	def fromDecode3(self,my_input,count_params):
+		
+		if type(my_input) is dict:
+		
+			my_key = list(my_input.keys())[0]
+			my_dict = my_input[my_key]
+			
+			if my_key.upper()=="SELECTALL":
+				qry,params_a = self.decodeSelectAll4(my_dict,count_params)
+			elif my_key.upper()=="SELECT":
+				qry,params_a = self.decodeSelect4(my_dict,count_params)
 			
 			output = "FROM ("+qry+") "
 		else:
 			output = "FROM "+self.sanitize(str(my_input))+" "
+			params = []
 		
 		return output,params
 		
-	def fromDecode4(self,my_input,params=[]):
+	def fromDecode4(self,my_input):
 		if type(my_input) is dict:
 			output = ""
 		else:
 			output = "FROM "+str(self.sanitize(str(my_input)))+" "
+			
+		params=[]
+		
 		return output,params
 		
-	def whereDecode(self,my_where_input,params=[]):
+	def whereDecode(self,my_where_input,count_params=0):
 		output = ""
 		params_output = []
+		params=[]
 		a=0
 		for item in my_where_input:
 			jsql_operator = item[0]
@@ -160,9 +168,11 @@ class jsql:
 					my_dict = my_item_value[my_key]
 					
 					if my_key.upper()=="SELECTALL":
-						qry,params = self.decodeSelectAll2(my_dict,params)
+						qry,params_a = self.decodeSelectAll2(my_dict,(len(params)+count_params))
 					elif my_key.upper()=="SELECT":
-						qry,params = self.decodeSelect2(my_dict,params)
+						qry,params_a = self.decodeSelect2(my_dict,(len(params)+count_params))
+						
+					params+params_a
 					
 					if jsql_operator[0]==")" or jsql_operator[0]=="(":
 						output += self.closingBracketProcessor(jsql_operator)
@@ -234,7 +244,7 @@ class jsql:
 							output += " "+self.sanitize(str(my_item_key))+" "
 					
 					output += str(my_item_operator)
-					output += " $"+str(len(params)+1)+""
+					output += " $"+str(len(params)+1+count_params)+""
 					params.append(my_item_value)
 			else:
 				output += self.closingBracketProcessor(jsql_operator)+self.openingBracketProcessor(jsql_operator)
@@ -244,9 +254,10 @@ class jsql:
 
 		return output,params
 		
-	def whereDecode2(self,my_where_input,params=[]):
+	def whereDecode2(self,my_where_input,count_params=0):
 		output = ""
 		params_output = []
+		params=[]
 		a=0
 		for item in my_where_input:
 			jsql_operator = item[0]
@@ -269,9 +280,120 @@ class jsql:
 					my_dict = my_item_value[my_key]
 					
 					if my_key.upper()=="SELECTALL":
-						qry,params = self.decodeSelectAll3(my_dict,params)
+						qry,params_a = self.decodeSelectAll3(my_dict,(len(params)+count_params))
 					elif my_key.upper()=="SELECT":
-						qry,params = self.decodeSelect3(my_dict,params)
+						qry,params_a = self.decodeSelect3(my_dict,(len(params)+count_params))
+					
+					params+params_a
+					
+					if jsql_operator[0]==")" or jsql_operator[0]=="(":
+						output += self.closingBracketProcessor(jsql_operator)
+						output += " "+self.openingBracketProcessor(jsql_operator)
+						
+						if output[len(output)-1]=="(":
+							output += self.operationProcesser(jsql_operator)
+						else:
+							output += " "+self.operationProcesser(jsql_operator)
+							
+					elif(jsql_operator[len(jsql_operator)-1]==")" or jsql_operator[len(jsql_operator)-1]=="("):
+						
+						if output[len(output)-1]=="(":
+							output += self.operationProcesser(jsql_operator)
+						else:
+							output += " "+self.operationProcesser(jsql_operator)
+							
+						output += self.closingBracketProcessor(jsql_operator)
+						output += " "+self.openingBracketProcessor(jsql_operator)
+
+					else:
+						output += " " + self.operationProcesser(jsql_operator) 
+					
+					if output[len(output)-1]=="(":
+						output += self.sanitize(str(my_item_key))+" "
+					else:
+						if a==1:
+							output += self.sanitize(str(my_item_key))+" "
+						else:
+							output += " "+self.sanitize(str(my_item_key))+" "
+							
+					
+					output += str(my_item_operator)+" "
+					output += "("+qry+")"
+					
+				else:
+					if jsql_operator[0]==")" or jsql_operator[0]=="(":
+						output += self.closingBracketProcessor(jsql_operator)
+						output += " "+self.openingBracketProcessor(jsql_operator)
+						
+						if output[len(output)-1]=="(":
+							output += self.operationProcesser(jsql_operator)
+						else:
+							output += " "+self.operationProcesser(jsql_operator)
+						
+					elif(jsql_operator[len(jsql_operator)-1]==")" or jsql_operator[len(jsql_operator)-1]=="("):
+					
+						if output[len(output)-1]=="(":
+							output += self.operationProcesser(jsql_operator)
+						else:
+							output += " "+self.operationProcesser(jsql_operator)
+							
+						if self.operationProcesser(jsql_operator) == "":
+							output += self.closingBracketProcessor(jsql_operator)
+							output += self.openingBracketProcessor(jsql_operator) 
+						else:
+							output += self.closingBracketProcessor(jsql_operator)
+							output += " "+self.openingBracketProcessor(jsql_operator)
+
+					else:
+						output += " "+self.operationProcesser(jsql_operator)
+					
+					if output[len(output)-1]=="(":
+						output += self.sanitize(str(my_item_key))+" "
+					else:
+						if a==1:
+							output += self.sanitize(str(my_item_key))+" "
+						else:
+							output += " "+self.sanitize(str(my_item_key))+" "
+					
+					output += str(my_item_operator)
+					output += " $"+str(len(params)+1+count_params)+""
+					params.append(my_item_value)
+			else:
+				output += self.closingBracketProcessor(jsql_operator)+self.openingBracketProcessor(jsql_operator)
+		
+		return output,params
+		
+	def whereDecode3(self,my_where_input,count_params=0):
+		output = ""
+		params_output = []
+		params=[]
+		a=0
+		for item in my_where_input:
+			jsql_operator = item[0]
+			a=a+1
+			if a<len(my_where_input):
+				if a==1:
+					output += "WHERE"
+				
+				
+				my_item_key = list(item[1].keys())[0] 
+				
+				my_item_operator = item[1][my_item_key][0]
+				
+				my_item_value = item[1][my_item_key][1]
+				
+				
+				if (type(my_item_value) is dict) or (type(my_item_value) is list) or (type(my_item_value) is tuple):
+				
+					my_key = list(my_item_value.keys())[0]
+					my_dict = my_item_value[my_key]
+					
+					if my_key.upper()=="SELECTALL":
+						qry,params_a = self.decodeSelectAll4(my_dict,(len(params)+count_params))
+					elif my_key.upper()=="SELECT":
+						qry,params_a = self.decodeSelect4(my_dict,(len(params)+count_params))
+					
+					params+params_a
 					
 					if jsql_operator[0]==")" or jsql_operator[0]=="(":
 						output += self.closingBracketProcessor(jsql_operator)
@@ -349,18 +471,81 @@ class jsql:
 				output += self.closingBracketProcessor(jsql_operator)+self.openingBracketProcessor(jsql_operator)
 		
 		return output,params
+		
+	def whereDecode4(self,my_where_input,count_params=0):
+		output = ""
+		params_output = []
+		params=[]
+		a=0
+		for item in my_where_input:
+			jsql_operator = item[0]
+			a=a+1
+			if a<len(my_where_input):
+				if a==1:
+					output += "WHERE"
+				
+				
+				my_item_key = list(item[1].keys())[0] 
+				
+				my_item_operator = item[1][my_item_key][0]
+				
+				my_item_value = item[1][my_item_key][1]
+				
+				
+				if jsql_operator[0]==")" or jsql_operator[0]=="(":
+					output += self.closingBracketProcessor(jsql_operator)
+					output += " "+self.openingBracketProcessor(jsql_operator)
+					
+					if output[len(output)-1]=="(":
+						output += self.operationProcesser(jsql_operator)
+					else:
+						output += " "+self.operationProcesser(jsql_operator)
+					
+				elif(jsql_operator[len(jsql_operator)-1]==")" or jsql_operator[len(jsql_operator)-1]=="("):
+				
+					if output[len(output)-1]=="(":
+						output += self.operationProcesser(jsql_operator)
+					else:
+						output += " "+self.operationProcesser(jsql_operator)
+						
+					if self.operationProcesser(jsql_operator) == "":
+						output += self.closingBracketProcessor(jsql_operator)
+						output += self.openingBracketProcessor(jsql_operator) 
+					else:
+						output += self.closingBracketProcessor(jsql_operator)
+						output += " "+self.openingBracketProcessor(jsql_operator)
+
+				else:
+					output += " "+self.operationProcesser(jsql_operator)
+				
+				if output[len(output)-1]=="(":
+					output += self.sanitize(str(my_item_key))+" "
+				else:
+					if a==1:
+						output += self.sanitize(str(my_item_key))+" "
+					else:
+						output += " "+self.sanitize(str(my_item_key))+" "
+				
+				output += str(my_item_operator)
+				#output += " $"+str(len(params)+1)+""
+				params.append(my_item_value)
+			else:
+				output += self.closingBracketProcessor(jsql_operator)+self.openingBracketProcessor(jsql_operator)
+		
+		return output,params
 	
 	def decodeInsert(self,mydict,my_params=[]):
 		return "",""
 	
-	def decodeSelectAll(self,mydict,params=[]):
-		fromTxt,params = self.fromDecode(mydict["FROM"],params)
-		params2 = []
+	def decodeSelectAll(self,mydict):
+		fromTxt,params1 = self.fromDecode(mydict["FROM"])
+		
 		try:
 			myWhere = mydict["WHERE"]
-			whereTxt,params2 = self.whereDecode(myWhere,params2)
+			whereTxt,params2 = self.whereDecode(myWhere)
 		except:
 			whereTxt = ""
+			params2 = []
 		
 		try:
 			myGroupby = mydict["GROUPBY"]
@@ -376,17 +561,18 @@ class jsql:
 		
 		
 		qry = "SELECT * "+fromTxt+""+whereTxt+""+groupby+""+orderby
-		params = params+params2
+		params = params1+params2
 		return qry,params
 	
-	def decodeSelectAll2(self,mydict,params=[]):
-		fromTxt,params = self.fromDecode2(mydict["FROM"],params)
+	def decodeSelectAll2(self,mydict,count_params=0):
+		fromTxt,params1 = self.fromDecode2(mydict["FROM"])
 		
 		try:
 			myWhere = mydict["WHERE"]
-			whereTxt,params = self.whereDecode2(myWhere,params)
+			whereTxt,params2 = self.whereDecode2(myWhere,count_params)
 		except:
 			whereTxt = ""
+			params2 = []
 		
 		try:
 			myGroupby = mydict["GROUPBY"]
@@ -401,16 +587,20 @@ class jsql:
 			orderby = ""
 		
 		qry = "SELECT * "+fromTxt+""+whereTxt+""+groupby+""+orderby
+		
+		params = params1+params2
+		
 		return qry,params
 	
-	def decodeSelectAll3(self,mydict,params=[]):
-		fromTxt,params = self.fromDecode3(mydict["FROM"],params)
+	def decodeSelectAll3(self,mydict,count_params=0):
+		fromTxt,params1 = self.fromDecode3(mydict["FROM"],count_params)
 		
 		try:
 			myWhere = mydict["WHERE"]
-			whereTxt,params = self.whereDecode3(myWhere,params)
+			whereTxt,params2 = self.whereDecode3(myWhere,(len(params1)+count_params))
 		except:
 			whereTxt = ""
+			params2 = []
 		
 		try:
 			myGroupby = mydict["GROUPBY"]
@@ -426,17 +616,21 @@ class jsql:
 		
 		
 		qry = "SELECT * "+fromTxt+""+whereTxt+""+groupby+""+orderby
+		
+		params = params1+params2
+		
 		return qry,params
 	
-	def decodeSelect3(self,mydict,params=[]):
+	def decodeSelect4(self,mydict,count_params=0):
 		cols = self.sanitize(str(mydict["COLS"]))
-		fromTxt,params = self.fromDecode3(mydict["FROM"],params)
+		fromTxt,params1 = self.fromDecode4(mydict["FROM"],count_params)
 		
 		try:
 			myWhere = mydict["WHERE"]
-			whereTxt,params = self.whereDecode3(myWhere,params)
+			whereTxt,params2 = self.whereDecode4(myWhere,(len(params1)+count_params))
 		except:
 			whereTxt = ""
+			params2 = []
 		
 		try:
 			myGroupby = mydict["GROUPBY"]
@@ -452,17 +646,21 @@ class jsql:
 		
 		
 		qry = "SELECT "+cols+" "+fromTxt+""+whereTxt+""+groupby+""+orderby
+		
+		params = params1+params2
+		
 		return qry,params
 	
-	def decodeSelect2(self,mydict,params=[]):
+	def decodeSelect3(self,mydict,count_params=0):
 		cols = self.sanitize(str(mydict["COLS"]))
-		fromTxt,params = self.fromDecode2(mydict["FROM"],params)
+		fromTxt,params1 = self.fromDecode3(mydict["FROM"],count_params)
 		
 		try:
 			myWhere = mydict["WHERE"]
-			whereTxt,params = self.whereDecode2(myWhere,params)
+			whereTxt,params2 = self.whereDecode3(myWhere,(len(params1)+count_params))
 		except:
 			whereTxt = ""
+			params2 = []
 		
 		try:
 			myGroupby = mydict["GROUPBY"]
@@ -478,17 +676,21 @@ class jsql:
 		
 		
 		qry = "SELECT "+cols+" "+fromTxt+""+whereTxt+""+groupby+""+orderby
+		
+		params = params1+params2
+		
 		return qry,params
 	
-	def decodeSelect(self,mydict,params=[]):
+	def decodeSelect2(self,mydict,count_params):
 		cols = self.sanitize(str(mydict["COLS"]))
-		fromTxt,params = self.fromDecode(mydict["FROM"],params)
+		fromTxt,params1 = self.fromDecode2(mydict["FROM"])
 		
 		try:
 			myWhere = mydict["WHERE"]
-			whereTxt,params = self.whereDecode(myWhere,params)
+			whereTxt,params2 = self.whereDecode2(myWhere,(len(params1)+count_params))
 		except:
 			whereTxt = ""
+			params2 = []
 		
 		try:
 			myGroupby = mydict["GROUPBY"]
@@ -504,6 +706,38 @@ class jsql:
 		
 		
 		qry = "SELECT "+cols+" "+fromTxt+""+whereTxt+""+groupby+""+orderby
+		
+		params = params1+params2
+		
+		return qry,params
+	
+	def decodeSelect(self,mydict):
+		cols = self.sanitize(str(mydict["COLS"]))
+		fromTxt,params1 = self.fromDecode(mydict["FROM"])
+		count_params = len(params1)
+		try:
+			myWhere = mydict["WHERE"]
+			whereTxt,params2 = self.whereDecode(myWhere,count_params)
+		except:
+			whereTxt = ""
+			params2 = []
+		
+		try:
+			myGroupby = mydict["GROUPBY"]
+			groupby = self.groupbyDecode(myGroupby)
+		except:
+			groupby = ""
+		
+		try:
+			myOrderby = mydict["ORDERBY"]
+			orderby = self.orderbyDecode(myOrderby)
+		except:
+			orderby = ""
+			
+		params = params1+params2
+		
+		qry = "SELECT "+cols+" "+fromTxt+""+whereTxt+""+groupby+""+orderby
+		
 		return qry,params
 	
 	def decodeUpdate(self,mydict,params=[]):
@@ -550,6 +784,8 @@ class jsql:
 		my_key = list(mydict.keys())[0]
 		my_dict = mydict[my_key]
 		
+		params = []
+		
 		if my_key.upper()=="SELECTALL":
 			qry,params = self.decodeSelectAll(my_dict)
 			print("qry: "+qry)
@@ -572,6 +808,8 @@ class jsql:
 	
 	def jsonDecoder(self,mydict):
 	
+		params = []
+		
 		qry,params,my_dict,my_key = self.processKeyWords(mydict)
 		
 		if my_key.upper()=="PROCESS":
