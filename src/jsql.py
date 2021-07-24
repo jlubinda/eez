@@ -74,6 +74,23 @@ class jsql:
 			if myString in my_string:
 				a = a+1
 		return a
+	
+	def intoDecode(self,my_input):
+		output = self.sanitize(str(my_input))
+		params = []
+		return output,params
+	
+	def valuesDecode(self,mylist):
+		output = []
+		params = mylist
+		a = 0
+		for item in mylist:
+			a = a+1
+			out1 = item
+			out2 = "$"+str(a)
+			output.append(out2)
+		
+		return output,params
 		
 	def fromDecode(self,my_input,count_params=0):
 		
@@ -737,14 +754,53 @@ class jsql:
 		
 		return qry,params
 	
-	def decodeInsert(self,mydict,my_params=[]):
-		return "",""
+	def decodeInsert(self,mydict):
+		intoTxt,params1 = self.intoDecode(mydict["INTO"])
+		cols = self.sanitize(str(mydict["COLS"]))
+		valuesTxt,params2 = self.valuesDecode(mydict["VALUES"])
+			
+		params = params1+params2
+		
+		qry = "INSERT INTO "+intoTxt+" ("+cols+") VALUES ("+valuesTxt+")"
+		
+		return qry,params
 	
-	def decodeUpdate(self,mydict,params=[]):
-		return "",""
+	def decodeUpdate(self,mydict):
+		setTxt,params1 = self.setDecode(mydict["SET"])
+		count_params = len(params1)
+		try:
+			myTable = mydict["TABLE"]
+		except:
+			myTable = ""
+		
+		try:
+			myWhere = mydict["WHERE"]
+			whereTxt,params2 = self.whereDecode(myWhere,count_params)
+		except:
+			whereTxt = ""
+			params2 = []
+		
+		params = params1+params2
+		
+		qry = "UPDATE "+myTable+" SET "+setTxt+" "+whereTxt
+		
+		return qry,params
 	
 	def decodeDelete(self,mydict,params=[]):
-		return "",""
+		fromTxt,params1 = self.fromDecode(mydict["FROM"])
+		count_params = len(params1)
+		try:
+			myWhere = mydict["WHERE"]
+			whereTxt,params2 = self.whereDecode(myWhere,count_params)
+		except:
+			whereTxt = ""
+			params2 = []
+		
+		params = params1+params2
+		
+		qry = "DELETE "+fromTxt+""+whereTxt
+		
+		return qry,params
 	
 	def decodeTruncate(self,mydict):
 		return ""

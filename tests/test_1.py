@@ -464,6 +464,75 @@ class TestJSQL(unittest.TestCase):
 		sql_qry1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert params_1 == params_2
+	
+	
+	def test_update_1A(self):
+		jsql_qry1 = {"UPDATE":{"TABLE":"table1",
+			"SET":{"col1":"value1","col2":"value2","col3":"value3"},
+			"WHERE":[
+					['INIT ',{
+						"col4":['=','value4']
+					}],
+					['AND (',{
+						"col5":['LIKE','value5']
+					}],
+					['OR',{
+						"col6":['=','value6']
+					}],
+					['NOT',{
+						"col7":['=','value7']
+					}],
+					[') END']
+				]
+			}
+		}
+
+		sql_qry2 = "UPDATE table1 SET col1=$1,col2=$2,col3=$3 WHERE col4 = $4 AND (col5 LIKE $5 OR col6 = $6 NOT col7 = $7)"
+		
+		params_2 = ['value1','value2','value3','value4','value5','value6','value7']
+		
+		js = jsql()
+		
+		params_1 = []
+		
+		sql_qry1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
+		
+		assert sql_qry1 == sql_qry2
+
+
+	
+	def test_update_1B(self):
+		jsql_qry1 = {"UPDATE":{"TABLE":"table1",
+			"SET":{"col1":"value1","col2":"value2","col3":"value3"},
+			"WHERE":[
+					['INIT ',{
+						"col4":['=','value4']
+					}],
+					['AND (',{
+						"col5":['LIKE','value5']
+					}],
+					['OR',{
+						"col6":['=','value6']
+					}],
+					['NOT',{
+						"col7":['=','value7']
+					}],
+					[') END']
+				]
+			}
+		}
+
+		sql_qry2 = "UPDATE table1 SET col1=$1,col2=$2,col3=$3 WHERE col4 = $4 AND (col5 LIKE $5 OR col6 = $6 NOT col7 = $7)"
+		
+		params_2 = ['value1','value2','value3','value4','value5','value6','value7']
+		
+		js = jsql()
+		
+		params_1 = []
+		
+		sql_qry1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
+		
+		assert params_1 == params_2
 
 		
 	def test_process_1A(self):
