@@ -231,7 +231,7 @@ class TestJSQL(unittest.TestCase):
 		
 		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
-		print(qry_1)
+		#print(qry_1)
 		
 		assert (qry_1 == sql_qry1)
 		
@@ -275,7 +275,7 @@ class TestJSQL(unittest.TestCase):
 		
 		qry_1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
-		print("params_1: "+str(params_1))
+		#print("params_1: "+str(params_1))
 		
 		assert (qry_params_1 == params_1)
 	
@@ -355,7 +355,117 @@ class TestJSQL(unittest.TestCase):
 		sql_qry1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
 		
 		assert params_1 == params_2
+
 	
+	
+	def test_delete_1A(self):
+		jsql_qry1 = {"DELETE":{"FROM":"table1",
+			"WHERE":[
+					['INIT ',{
+						"col1":['=','value1']
+					}],
+					['AND (',{
+						"col2":['LIKE','value2']
+					}],
+					['OR',{
+						"col3":['=','value3']
+					}],
+					['NOT',{
+						"col4":['=','value4']
+					}],
+					[') END']
+				]
+			}
+		}
+
+		sql_qry2 = "DELETE FROM table1 WHERE col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 = $4)"
+		
+		params_2 = ['value1','value2','value3','value4']
+		
+		js = jsql()
+		
+		params_1 = []
+		
+		sql_qry1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
+		
+		assert sql_qry1 == sql_qry2
+
+
+	
+	def test_delete_1B(self):
+		jsql_qry1 = {"DELETE":{"FROM":"table1",
+			"WHERE":[
+					['INIT ',{
+						"col1":['=','value1']
+					}],
+					['AND (',{
+						"col2":['LIKE','value2']
+					}],
+					['OR',{
+						"col3":['=','value3']
+					}],
+					['NOT',{
+						"col4":['=','value4']
+					}],
+					[') END']
+				]
+			}
+		}
+
+		sql_qry2 = "DELETE FROM table1 WHERE col1 = $1 AND (col2 LIKE $2 OR col3 = $3 NOT col4 = $4)"
+		
+		params_2 = ['value1','value2','value3','value4']
+		
+		js = jsql()
+		
+		params_1 = []
+		
+		sql_qry1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
+		
+		assert params_1 == params_2
+	
+	
+	def test_insert_1A(self):
+		jsql_qry1 = {"INSERT":{"INTO":"table1",
+			"COLS":['col1','col2','col3'],
+			"VALUES":['value1','value2','value3']
+			}
+		}
+
+		sql_qry2 = "INSERT INTO table1 (col1,col2,col3) VALUES ($1,$2,$3)"
+		
+		params_2 = ['value1','value2','value3']
+		
+		js = jsql()
+		
+		params_1 = []
+		
+		sql_qry1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
+		
+		assert sql_qry1 == sql_qry2
+
+
+	
+	def test_insert_1B(self):
+		jsql_qry1 = {"INSERT":{"INTO":"table1",
+			"COLS":['col1','col2','col3'],
+			"VALUES":['value1','value2','value3']
+			}
+		}
+
+		sql_qry2 = "INSERT INTO table1 (col1,col2,col3) VALUES ($1,$2,$3)"
+		
+		params_2 = ['value1','value2','value3']
+		
+		js = jsql()
+		
+		params_1 = []
+		
+		sql_qry1,params_1,my_key,output = js.jsonDecoder(jsql_qry1)
+		
+		assert params_1 == params_2
+
+		
 	def test_process_1A(self):
 
 		jsql_qry = {"PROCESS":{

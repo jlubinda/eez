@@ -534,9 +534,6 @@ class jsql:
 		
 		return output,params
 	
-	def decodeInsert(self,mydict,my_params=[]):
-		return "",""
-	
 	def decodeSelectAll(self,mydict):
 		fromTxt,params1 = self.fromDecode(mydict["FROM"])
 		
@@ -739,6 +736,9 @@ class jsql:
 		qry = "SELECT "+cols+" "+fromTxt+""+whereTxt+""+groupby+""+orderby
 		
 		return qry,params
+	
+	def decodeInsert(self,mydict,my_params=[]):
+		return "",""
 	
 	def decodeUpdate(self,mydict,params=[]):
 		return "",""
