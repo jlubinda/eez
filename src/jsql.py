@@ -80,15 +80,30 @@ class jsql:
 		params = []
 		return output,params
 	
+	def setDecode(self,my_input):
+		params = []
+		cols = ""
+		a=0
+		for my_key in my_input.keys():
+			a = a+1
+			params.append(my_input[my_key])
+			if a>1:
+				cols += ","
+			cols += self.sanitize(str(my_key))+"=$"+str(a)
+		
+		return cols,params
+	
 	def valuesDecode(self,mylist):
-		output = []
+		output = ""
 		params = mylist
 		a = 0
 		for item in mylist:
 			a = a+1
 			out1 = item
+			if a>1:
+				output += ","
 			out2 = "$"+str(a)
-			output.append(out2)
+			output += out2
 		
 		return output,params
 		
@@ -803,7 +818,8 @@ class jsql:
 		return qry,params
 	
 	def decodeTruncate(self,mydict):
-		return ""
+		qry = "TRUNCATE "+str(mydict)
+		return qry
 	
 	def decodeProcess(self,mydict,params=[]):
 		return "",""
@@ -863,8 +879,6 @@ class jsql:
 		return qry,params,my_dict,my_key.upper()
 	
 	def jsonDecoder(self,mydict):
-	
-		params = []
 		
 		qry,params,my_dict,my_key = self.processKeyWords(mydict)
 		

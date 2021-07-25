@@ -571,7 +571,7 @@ class TestJSQL(unittest.TestCase):
 		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry)
 		test_output = [3.0, 138.0, 885.0, 3108.0, 8055.0, 17358.0, 33033.0, 57480.0, 93483.0, 144210.0, 213213.0]
 		
-		print(output)
+		#print(output)
 		
 		assert(test_output==output)
 		
@@ -581,6 +581,15 @@ class TestJSQL(unittest.TestCase):
 	#"DATA_REFERENCE":{"RES_LIST_OUTPUT":3:9}
 
 	
+	def test_truncate(self):
+
+		jsql_qry = {"TRUNCATE":"test1"}
+		
+		js = jsql()
+		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry)
+		test_output = "TRUNCATE test1"
+		assert(test_output==sql_qry1)
+
 	def test_process_1C(self):
 
 		jsql_qry = {"PROCESS":{
