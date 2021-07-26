@@ -883,6 +883,7 @@ class jsql:
 		qry,params,my_dict,my_key = self.processKeyWords(mydict)
 		
 		if my_key.upper()=="PROCESS":
+			print(my_dict)
 			res,appendData1 = self.processor(my_dict)
 			print("appendData1: "+str(appendData1))
 			try:
@@ -905,21 +906,37 @@ class jsql:
 			except:
 				try:
 					per_result = appendData1["PER_RESULT"]
-					resx,params,my_dict = self.processKeyWords(per_result)
-					res = qry
+					resx,paramsx,my_dictx,my_keyx = self.processKeyWords(per_result) #Jason# my_keyx added because function returns 4 arguments, not 3
 					output = []
 					#output["res_items"] = []
 					#output["appended_items"] = []
-					a = -1
-					for item in res:
-						a = a+1
-						qry2,params2,my_dict2,my_key2 = self.processKeyWords(item)
-						if my_key2.upper()=="PROCESS":
-							res2,appendData2 = self.processor(my_dict2)
-							output.append({"res_items":item,"appended_items":res2})
-						else:
-							output.append({"res_items":item,"appended_items":qry2})
-					#print("PER_RESULT")
+					
+#Jason# alternate implementation
+					for key,value in my_dictx.items():
+						if key == "DATA":
+							temp = my_dictx[key]
+							my_dictx[key] = output
+							my_dictx[key].append(res)
+							my_dictx[key].append(temp)
+							
+					res2,appendData2 = self.processor(my_dictx)
+					output = res2
+#Jason# alternate implementation - done
+
+					# res = qry
+					# a = -1
+					# for item in res:
+					# 	a = a+1
+					# 	qry2,params2,my_dict2,my_key2 = self.processKeyWords(item) #Jason# none of the items are valid inputs to processKeyWords(), because processKeyWords only takes in dictionaries
+					# 	if my_key2.upper()=="PROCESS":
+					# 		res2,appendData2 = self.processor(my_dict2)
+					# 		output.append({"res_items":item,"appended_items":res2})
+					# 	else:
+					# 		output.append({"res_items":item,"appended_items":qry2})
+					# #print("PER_RESULT")
+
+
+
 				except:
 					output = res
 					#print("JUST RESULT (No Nesting)")
