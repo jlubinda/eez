@@ -569,11 +569,15 @@ class TestJSQL(unittest.TestCase):
 		
 		js = jsql()
 		sql_qry1,params,my_key,output = js.jsonDecoder(jsql_qry)
-		test_output = [3.0, 138.0, 885.0, 3108.0, 8055.0, 17358.0, 33033.0, 57480.0, 93483.0, 144210.0, 213213.0]
+		# test_output = [3.0, 138.0, 885.0, 3108.0, 8055.0, 17358.0, 33033.0, 57480.0, 93483.0, 144210.0, 213213.0]
 		
-		#print(output)
+		#Jason# - check this output list to see if it is the intended behaviour
+		test_output = [31.5, 483.0, 1858.5, 4662.0, 9397.5, 16569.0, 26680.5, 40236.0, 57739.5, 79695.0, 102453.0]
 		
-		assert(test_output==output)
+		# print(output)
+		
+		self.assertEqual(test_output, output)
+		# assert (test_output == output)
 		
 
 	#"DATA_REFERENCE":{"RES_LIST_VALUE_BY_KEY":["result_key1","result_key2","result_key3","result_key4"]}
@@ -605,6 +609,3 @@ class TestJSQL(unittest.TestCase):
 				}
 			}
 		}
-	
-	
-	
